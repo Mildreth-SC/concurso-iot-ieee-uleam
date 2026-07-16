@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# I Concurso Nacional IoT ULEAM 2026
 
-## Getting Started
+Landing page y formulario de inscripción para el concurso nacional IoT de la Rama Estudiantil IEEE ULEAM.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** + Tailwind CSS 4
+- **React Hook Form** + Zod
+- **Supabase** — inscripciones (Postgres), contenido del sitio y archivos (Storage)
+- **Resend** — emails de confirmación
+- **Cloudflare Workers** (adaptador OpenNext) — hosting
+
+## Desarrollo local
 
 ```bash
+npm install
+# Crea .env.local con las variables de abajo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Crea un archivo `.env.local` (no se sube al repo):
 
-## Learn More
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (solo servidor, secreto) |
+| `RESEND_API_KEY` | API key de Resend (emails) |
+| `RESEND_FROM_EMAIL` | Remitente verificado (ej. `concurso@tudominio.com`) |
+| `ADMIN_PASSWORD` | Contraseña del panel `/admin` |
+| `ADMIN_SESSION_SECRET` | Cadena aleatoria para firmar la sesión admin |
 
-To learn more about Next.js, take a look at the following resources:
+## Supabase (base de datos + storage)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Crea un proyecto en [supabase.com](https://supabase.com).
+2. **SQL Editor → New query**: pega y ejecuta todo `supabase/schema.sql`.
+   Esto crea la tabla `registrations`, la tabla `site_content` y el bucket público `site-assets`.
+3. Copia **Project URL** y **service_role key** (Project Settings → API) a `.env.local`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy en Cloudflare Workers
 
-## Deploy on Vercel
+El proyecto usa el adaptador [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Opción A — Desde el dashboard (recomendado)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Sube este repo a GitHub.
+2. En [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create → Import a repository**.
+3. Framework: **Next.js**. Deja que detecte la configuración (`wrangler.jsonc`).
+4. En **Build variables and secrets** añade TODAS las variables de entorno
+   (incluida `NEXT_PUBLIC_SUPABASE_URL` para que el build las tenga).
+5. Deploy. Obtendrás una URL `*.workers.dev` gratuita.
+
+### Opción B — Desde tu máquina
+
+```bash
+npx wrangler login
+npm run deploy
+```
+
+### Comandos útiles
+
+- `npm run preview` — corre la app en el runtime de Workers localmente (más fiel a producción).
+- `npm run deploy` — build + deploy a Cloudflare.
+
+## Panel administrativo
+
+- Ruta: `/admin` (protegida por `ADMIN_PASSWORD`).
+- Gestiona inscritos, logos de organizadores y sponsors.
+- Los logos/sponsors y comprobantes se guardan en Supabase Storage (bucket `site-assets`).
+
+## Checklist de contenido
+
+- [x] Fecha presentación: 11 de noviembre 2026
+- [x] Costo no IEEE: $15.00 USD
+- [x] Datos bancarios en formulario
+- [x] Comprobante obligatorio para no IEEE
+- [x] Número IEEE obligatorio para miembros
+- [x] Contacto: uleamieee@gmail.com
+- [x] Diseño neón/cyberpunk
+- [ ] PDF de bases en `public/` (pendiente archivo oficial)
+- [ ] Emails de confirmación (requiere Resend configurado)
