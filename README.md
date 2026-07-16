@@ -50,8 +50,9 @@ El proyecto usa el adaptador [`@opennextjs/cloudflare`](https://opennext.js.org/
 2. En [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create → Import a repository**.
 3. Framework: **Next.js**. Deja que detecte la configuración (`wrangler.jsonc`).
 4. Comandos de build (importante):
-   - **Build command:** `npm run build` (ejecuta OpenNext → genera `.open-next/`)
+   - **Build command:** `npm run cf:build` (OpenNext llama internamente a `next build`)
    - **Deploy command:** `npx wrangler deploy`
+   - No uses `npm run build` como comando de Cloudflare: OpenNext también ejecuta `npm run build` y se crea un bucle infinito.
 5. En **Build variables and secrets** añade TODAS las variables de entorno
    (incluida `NEXT_PUBLIC_SUPABASE_URL` para que el build las tenga).
 6. Deploy. Obtendrás una URL `*.workers.dev` gratuita.
