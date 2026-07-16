@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   Download,
   ExternalLink,
+  Eye,
   ImagePlus,
   LockKeyhole,
   LogOut,
@@ -13,6 +14,7 @@ import {
   Search,
   Trash2,
   Users,
+  X,
 } from "lucide-react";
 import { CATEGORIES, SPONSOR_TIERS } from "@/lib/constants";
 import { NeonCard, inputClassName } from "@/components/ui/primitives";
@@ -58,6 +60,7 @@ export function AdminPanel() {
   const [sponsors, setSponsors] = useState<SponsorItem[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [selected, setSelected] = useState<Registration | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -475,6 +478,7 @@ export function AdminPanel() {
                     <th className="px-4 py-4">Integrantes</th>
                     <th className="px-4 py-4">Contacto</th>
                     <th className="px-4 py-4">Registro</th>
+                    <th className="px-4 py-4">Detalle</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -518,11 +522,21 @@ export function AdminPanel() {
                           <span className="text-neon-green">IEEE / —</span>
                         )}
                       </td>
+                      <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          onClick={() => setSelected(registration)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-neon-cyan/30 px-3 py-1.5 text-xs text-neon-cyan hover:bg-neon-cyan/10"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          Ver
+                        </button>
+                      </td>
                     </tr>
                   ))}
                   {!loading && filtered.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-4 py-12 text-center text-text-muted">
+                      <td colSpan={7} className="px-4 py-12 text-center text-text-muted">
                         Aún no hay inscritos. Cuando lleguen, aparecerán aquí.
                       </td>
                     </tr>
@@ -530,6 +544,187 @@ export function AdminPanel() {
                 </tbody>
               </table>
             </div>
+
+            {selected && (
+              <div
+                className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center"
+                onClick={() => setSelected(null)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") setSelected(null);
+                }}
+                role="presentation"
+              >
+                <div
+                  className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-neon-cyan/30 bg-bg-card p-6 shadow-2xl"
+                  onClick={(event) => event.stopPropagation()}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="detalle-inscrito-titulo"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neon-cyan">
+                        Detalle de inscripción
+                      </p>
+                      <h2
+                        id="detalle-inscrito-titulo"
+                        className="mt-2 font-display text-2xl text-text-primary"
+                      >
+                        {selected.team_name}
+                      </h2>
+                      <p className="mt-1 text-sm text-text-muted">
+                        Registrado el{" "}
+                        {new Date(selected.created_at).toLocaleString("es-EC")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelected(null)}
+                      className="rounded-lg border border-white/10 p-2 text-text-muted hover:text-neon-cyan"
+                      aria-label="Cerrar detalle"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">Categoría</p>
+                      <p className="mt-1 text-text-primary">
+                        {CATEGORIES.find((c) => c.id === selected.category)?.name ??
+                          selected.category}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Rama IEEE
+                      </p>
+                      <p className="mt-1 text-text-primary">
+                        {selected.belongs_to_ieee_branch ? "Sí" : "No"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Institución que representa
+                      </p>
+                      <p className="mt-1 text-text-primary">
+                        {selected.representing_institution}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Otra institución
+                      </p>
+                      <p className="mt-1 text-text-primary">
+                        {selected.other_institution || "—"}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Correo de contacto
+                      </p>
+                      <a
+                        href={`mailto:${selected.contact_email}`}
+                        className="mt-1 block text-neon-cyan hover:underline"
+                      >
+                        {selected.contact_email}
+                      </a>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Códigos IEEE
+                      </p>
+                      <p className="mt-1 font-mono text-text-primary">
+                        {selected.ieee_membership_codes}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        ¿Cómo se enteró?
+                      </p>
+                      <p className="mt-1 text-text-primary">{selected.hear_about}</p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Tamaño del equipo
+                      </p>
+                      <p className="mt-1 text-text-primary">{selected.team_size}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-neon-cyan/15 p-4">
+                    <p className="text-xs uppercase tracking-wider text-text-muted">
+                      Integrantes
+                    </p>
+                    <div className="mt-3 overflow-x-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="text-xs uppercase tracking-wider text-neon-cyan/80">
+                          <tr>
+                            <th className="pb-2 pr-3">#</th>
+                            <th className="pb-2 pr-3">Nombre</th>
+                            <th className="pb-2 pr-3">Cédula</th>
+                            <th className="pb-2">Carrera</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {(selected.members ?? []).map((member, index) => (
+                            <tr key={`${member.cedula}-${index}`}>
+                              <td className="py-2 pr-3 text-text-muted">{index + 1}</td>
+                              <td className="py-2 pr-3 text-text-primary">{member.name}</td>
+                              <td className="py-2 pr-3 font-mono text-text-muted">
+                                {member.cedula}
+                              </td>
+                              <td className="py-2 text-text-muted">{member.career}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-neon-cyan/15 p-4">
+                    <p className="text-xs uppercase tracking-wider text-text-muted">
+                      Comprobante / registro
+                    </p>
+                    {selected.payment_proof_url ? (
+                      <div className="mt-3 space-y-3">
+                        <a
+                          href={selected.payment_proof_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-neon-cyan hover:underline"
+                        >
+                          Abrir comprobante <ExternalLink className="h-4 w-4" />
+                        </a>
+                        {/\.(png|jpe?g|webp|gif)(\?|$)/i.test(selected.payment_proof_url) && (
+                          <div className="relative h-48 w-full overflow-hidden rounded-lg border border-white/10 bg-white/5">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={selected.payment_proof_url}
+                              alt="Comprobante de pago"
+                              className="h-full w-full object-contain"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-neon-green">
+                        Sin comprobante — inscripción con códigos IEEE
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-neon-cyan/15 p-4">
+                    <p className="text-xs uppercase tracking-wider text-text-muted">
+                      Comentarios
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap text-text-primary">
+                      {selected.comments?.trim() || "—"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 
