@@ -106,9 +106,8 @@ export function RegistrationForm() {
     try {
       const payload = {
         ...data,
-        // Si hay IEEE válido, no guardar comprobante residual
         paymentProofUrl: needsPaymentProof(data.ieeeMembershipCodes)
-          ? data.paymentProofUrl
+          ? data.paymentProofUrl?.trim() || undefined
           : undefined,
       };
 

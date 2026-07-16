@@ -40,20 +40,14 @@ export const registrationSchema = z
     otherInstitution: z.string().optional(),
     category: z.enum(categoryIds, { message: "Selecciona una categoría" }),
     teamName: z.string().min(2, "Nombre del equipo requerido"),
-    teamSize: z.coerce.number().int().min(2).max(4),
+    teamSize: z.number().int().min(2).max(4),
     members: z
       .array(memberSchema)
       .min(2, "Mínimo 2 integrantes")
       .max(4, "Máximo 4 integrantes"),
     contactEmail: z.string().email("Correo de contacto inválido"),
     ieeeMembershipCodes: z.string().min(1, "Indica códigos IEEE o escribe N/A"),
-    paymentProofUrl: z
-      .string()
-      .optional()
-      .transform((value) => {
-        const trimmed = value?.trim() ?? "";
-        return trimmed.length > 0 ? trimmed : undefined;
-      }),
+    paymentProofUrl: z.string().optional(),
     hearAbout: z.enum(hearAboutOptions, {
       message: "Indica cómo te enteraste del evento",
     }),
@@ -98,7 +92,8 @@ export const registrationSchema = z
     }
 
     if (needsPaymentProof(data.ieeeMembershipCodes)) {
-      if (!data.paymentProofUrl) {
+      const proof = data.paymentProofUrl?.trim();
+      if (!proof) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:
@@ -108,7 +103,7 @@ export const registrationSchema = z
       } else {
         try {
           // eslint-disable-next-line no-new
-          new URL(data.paymentProofUrl);
+          new URL(proof);
         } catch {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
