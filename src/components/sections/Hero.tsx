@@ -85,7 +85,7 @@ export function Hero() {
             <br />
             <span className="text-text-primary">Nacional IoT</span>
             <span className="mt-2 block bg-gradient-to-r from-neon-cyan via-white to-neon-blue bg-clip-text text-2xl text-transparent sm:text-4xl">
-              ULEAM 2026
+              IEEE ULEAM 2026
             </span>
           </h1>
 
