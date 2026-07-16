@@ -109,36 +109,44 @@ export const CATEGORIES = [
   },
 ] as const;
 
-/** Instituciones / ramas del formulario oficial de inscripción */
-export const INSTITUTIONS = [
-  "Otra institución",
-  "Otra Rama Estudiantil IEEE",
+/** Ramas IEEE conocidas (orden alfabético) */
+export const IEEE_BRANCHES = [
   "Rama Estudiantil IEEE EPN",
-  "Rama Estudiantil IEEE ESPOCH",
   "Rama Estudiantil IEEE ESPE",
+  "Rama Estudiantil IEEE ESPOCH",
   "Rama Estudiantil IEEE ESPOL",
+  "Rama Estudiantil IEEE ITO",
   "Rama Estudiantil IEEE UCACUE",
+  "Rama Estudiantil IEEE UCE",
   "Rama Estudiantil IEEE UCuenca",
-  "Rama Estudiantil IEEE UDLA",
   "Rama Estudiantil IEEE UDA",
+  "Rama Estudiantil IEEE UDLA",
+  "Rama Estudiantil IEEE UG",
   "Rama Estudiantil IEEE UIDE",
   "Rama Estudiantil IEEE ULEAM",
-  "Rama Estudiantil IEEE UPS Quito",
+  "Rama Estudiantil IEEE UNACH",
   "Rama Estudiantil IEEE UPS Cuenca",
   "Rama Estudiantil IEEE UPS Guayaquil",
+  "Rama Estudiantil IEEE UPS Quito",
+  "Rama Estudiantil IEEE UPSE",
   "Rama Estudiantil IEEE USFQ",
   "Rama Estudiantil IEEE UTA",
   "Rama Estudiantil IEEE UTC",
-  "Rama Estudiantil IEEE UTN",
   "Rama Estudiantil IEEE UTE",
-  "Rama Estudiantil IEEE UCE",
-  "Rama Estudiantil IEEE UTPL",
-  "Rama Estudiantil IEEE UG",
-  "Rama Estudiantil IEEE UPSE",
-  "Rama Estudiantil IEEE ITO",
-  "Rama Estudiantil IEEE Yachay Tech",
-  "Rama Estudiantil IEEE UNACH",
   "Rama Estudiantil IEEE UTEQ",
+  "Rama Estudiantil IEEE UTN",
+  "Rama Estudiantil IEEE UTPL",
+  "Rama Estudiantil IEEE Yachay Tech",
+] as const;
+
+export const OTHER_IEEE_BRANCH = "Otra Rama Estudiantil IEEE";
+export const OTHER_INSTITUTION = "Otra institución";
+
+/** Valores posibles guardados en representing_institution */
+export const INSTITUTIONS = [
+  ...IEEE_BRANCHES,
+  OTHER_IEEE_BRANCH,
+  OTHER_INSTITUTION,
 ] as const;
 
 export const HEAR_ABOUT_OPTIONS = [

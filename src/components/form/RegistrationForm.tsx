@@ -12,7 +12,9 @@ import {
 import {
   CATEGORIES,
   BANK_DETAILS,
-  INSTITUTIONS,
+  IEEE_BRANCHES,
+  OTHER_IEEE_BRANCH,
+  OTHER_INSTITUTION,
   HEAR_ABOUT_OPTIONS,
   TEAM_SIZES,
   CONTACT_EMAIL,
@@ -70,10 +72,8 @@ export function RegistrationForm() {
   const ieeeMembershipCodes = watch("ieeeMembershipCodes");
   const paymentProofUrl = watch("paymentProofUrl");
 
-  const needsOtherInstitution =
-    !belongsToIeeeBranch ||
-    representingInstitution === "Otra institución" ||
-    representingInstitution === "Otra Rama Estudiantil IEEE";
+  const needsOtherIeeeUniversity =
+    belongsToIeeeBranch && representingInstitution === OTHER_IEEE_BRANCH;
 
   const codesUpper = (ieeeMembershipCodes ?? "").trim().toUpperCase();
   const hasIeeeCodes = codesUpper !== "" && codesUpper !== "N/A";
@@ -187,9 +187,13 @@ export function RegistrationForm() {
                   <input
                     type="radio"
                     checked={belongsToIeeeBranch === true}
-                    onChange={() =>
-                      setValue("belongsToIeeeBranch", true, { shouldValidate: true })
-                    }
+                    onChange={() => {
+                      setValue("belongsToIeeeBranch", true, { shouldValidate: true });
+                      setValue("representingInstitution", undefined as never, {
+                        shouldValidate: false,
+                      });
+                      setValue("otherInstitution", "", { shouldValidate: false });
+                    }}
                     className="accent-neon-cyan"
                   />
                   Sí
@@ -198,9 +202,13 @@ export function RegistrationForm() {
                   <input
                     type="radio"
                     checked={belongsToIeeeBranch === false}
-                    onChange={() =>
-                      setValue("belongsToIeeeBranch", false, { shouldValidate: true })
-                    }
+                    onChange={() => {
+                      setValue("belongsToIeeeBranch", false, { shouldValidate: true });
+                      setValue("representingInstitution", OTHER_INSTITUTION, {
+                        shouldValidate: true,
+                      });
+                      setValue("otherInstitution", "", { shouldValidate: false });
+                    }}
                     className="accent-neon-cyan"
                   />
                   No
@@ -208,40 +216,59 @@ export function RegistrationForm() {
               </div>
             </FormField>
 
-            <div className="mt-4">
-              <FormField
-                label="Institución que representa"
-                error={errors.representingInstitution?.message}
-                required
-              >
-                <select
-                  className={inputClassName}
-                  {...register("representingInstitution")}
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Selecciona una opción
-                  </option>
-                  {INSTITUTIONS.map((inst) => (
-                    <option key={inst} value={inst}>
-                      {inst}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-            </div>
+            {belongsToIeeeBranch ? (
+              <>
+                <div className="mt-4">
+                  <FormField
+                    label="Rama estudiantil IEEE que representa"
+                    error={errors.representingInstitution?.message}
+                    required
+                  >
+                    <select
+                      className={inputClassName}
+                      {...register("representingInstitution")}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        Selecciona una rama (A–Z)
+                      </option>
+                      {IEEE_BRANCHES.map((inst) => (
+                        <option key={inst} value={inst}>
+                          {inst}
+                        </option>
+                      ))}
+                      <option value={OTHER_IEEE_BRANCH}>{OTHER_IEEE_BRANCH}</option>
+                    </select>
+                  </FormField>
+                </div>
 
-            {needsOtherInstitution && (
+                {needsOtherIeeeUniversity && (
+                  <div className="mt-4">
+                    <FormField
+                      label="¿A qué universidad pertenece esa rama IEEE?"
+                      error={errors.otherInstitution?.message}
+                      required
+                    >
+                      <input
+                        className={inputClassName}
+                        {...register("otherInstitution")}
+                        placeholder="Nombre de la universidad"
+                      />
+                    </FormField>
+                  </div>
+                )}
+              </>
+            ) : (
               <div className="mt-4">
                 <FormField
-                  label="En caso de no pertenecer a una rama estudiantil de IEEE, ¿a qué institución o universidad perteneces?"
+                  label="Nombre de la institución o universidad"
                   error={errors.otherInstitution?.message}
                   required
                 >
                   <input
                     className={inputClassName}
                     {...register("otherInstitution")}
-                    placeholder="Nombre de la universidad o institución"
+                    placeholder="Ej: Universidad Técnica de Manabí"
                   />
                 </FormField>
               </div>

@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { CATEGORIES, HEAR_ABOUT_OPTIONS, INSTITUTIONS } from "./constants";
+import {
+  CATEGORIES,
+  HEAR_ABOUT_OPTIONS,
+  INSTITUTIONS,
+  OTHER_IEEE_BRANCH,
+  OTHER_INSTITUTION,
+} from "./constants";
 
 const categoryIds = CATEGORIES.map((c) => c.id) as [string, ...string[]];
 const institutionOptions = INSTITUTIONS as unknown as [string, ...string[]];
@@ -57,15 +63,28 @@ export const registrationSchema = z
     }),
   })
   .superRefine((data, ctx) => {
-    const needsOther =
-      !data.belongsToIeeeBranch ||
-      data.representingInstitution === "Otra institución" ||
-      data.representingInstitution === "Otra Rama Estudiantil IEEE";
-
-    if (needsOther && !data.otherInstitution?.trim()) {
+    if (data.belongsToIeeeBranch) {
+      if (data.representingInstitution === OTHER_INSTITUTION) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Selecciona tu rama IEEE o 'Otra Rama Estudiantil IEEE'",
+          path: ["representingInstitution"],
+        });
+      }
+      if (
+        data.representingInstitution === OTHER_IEEE_BRANCH &&
+        !data.otherInstitution?.trim()
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Indica la universidad a la que pertenece esa rama IEEE",
+          path: ["otherInstitution"],
+        });
+      }
+    } else if (!data.otherInstitution?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Indica la institución o universidad a la que perteneces",
+        message: "Indica el nombre de tu institución o universidad",
         path: ["otherInstitution"],
       });
     }
