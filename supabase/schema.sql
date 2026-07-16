@@ -62,9 +62,13 @@ on conflict (id) do nothing;
 -- ---------------------------------------------------------------------
 -- 3) Storage: bucket público para logos, sponsors y comprobantes
 -- ---------------------------------------------------------------------
-insert into storage.buckets (id, name, public)
-values ('site-assets', 'site-assets', true)
-on conflict (id) do nothing;
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('site-assets', 'site-assets', true, 10485760)
+on conflict (id) do update set public = excluded.public;
+
+-- Limpia policies previas para poder re-ejecutar el script
+drop policy if exists "Public read site-assets" on storage.objects;
+drop policy if exists "Service role write site-assets" on storage.objects;
 
 -- Lectura pública de los archivos del bucket
 create policy "Public read site-assets"

@@ -25,6 +25,32 @@ function slugify(value: string) {
   );
 }
 
+async function ensurePublicBucket() {
+  const supabase = getSupabaseAdmin();
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+  if (listError) throw listError;
+
+  const exists = buckets?.some((bucket) => bucket.name === STORAGE_BUCKET);
+  if (exists) return;
+
+  const { error: createError } = await supabase.storage.createBucket(STORAGE_BUCKET, {
+    public: true,
+    fileSizeLimit: 10 * 1024 * 1024,
+    allowedMimeTypes: [
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+    ],
+  });
+
+  // Si otro proceso lo creó en paralelo, ignoramos el conflicto
+  if (createError && !/already exists|duplicate/i.test(createError.message)) {
+    throw createError;
+  }
+}
+
 /**
  * Sube un archivo al bucket público de Supabase Storage y devuelve su URL pública.
  * folder: p.ej. "logos", "sponsors", "payment-proofs".
@@ -35,6 +61,8 @@ export async function uploadPublicFile(
   filenameHint?: string,
 ): Promise<string> {
   const supabase = getSupabaseAdmin();
+  await ensurePublicBucket();
+
   const ext = extFromType(file.type, file.name.split(".").pop() ?? "bin");
   const base = filenameHint ? slugify(filenameHint) : slugify(file.name);
   const path = `${folder}/${base}-${Date.now()}.${ext}`;

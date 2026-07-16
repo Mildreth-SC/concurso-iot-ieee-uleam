@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle } from "lucide-react";
 import {
   registrationSchema,
+  needsPaymentProof,
   type RegistrationFormData,
 } from "@/lib/validations";
 import {
@@ -54,7 +55,7 @@ export function RegistrationForm() {
       paymentProofUrl: "",
       hearAbout: undefined,
       comments: "",
-      acceptsTerms: undefined,
+      acceptsTerms: false,
     },
   });
 
@@ -76,7 +77,7 @@ export function RegistrationForm() {
 
   const codesUpper = (ieeeMembershipCodes ?? "").trim().toUpperCase();
   const hasIeeeCodes = codesUpper !== "" && codesUpper !== "N/A";
-  const needsPaymentProof = !belongsToIeeeBranch || !hasIeeeCodes;
+  const showPaymentProof = needsPaymentProof(ieeeMembershipCodes);
 
   useEffect(() => {
     const size = Number(teamSize) || 2;
@@ -93,16 +94,38 @@ export function RegistrationForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamSize]);
 
+  // Si pasa a inscripción gratuita, limpia comprobante previo
+  useEffect(() => {
+    if (!showPaymentProof && paymentProofUrl) {
+      setValue("paymentProofUrl", "", { shouldValidate: true });
+    }
+  }, [showPaymentProof, paymentProofUrl, setValue]);
+
   async function onSubmit(data: RegistrationFormData) {
     setSubmitError(null);
     try {
+      const payload = {
+        ...data,
+        // Si hay IEEE válido, no guardar comprobante residual
+        paymentProofUrl: needsPaymentProof(data.ieeeMembershipCodes)
+          ? data.paymentProofUrl
+          : undefined,
+      };
+
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       const result = await res.json();
-      if (!res.ok) throw new Error(result.error ?? "Error al enviar inscripción");
+      if (!res.ok) {
+        const details = result.details?.fieldErrors
+          ? Object.values(result.details.fieldErrors as Record<string, string[]>)
+              .flat()
+              .join(" · ")
+          : null;
+        throw new Error(details || result.error || "Error al enviar inscripción");
+      }
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -366,7 +389,7 @@ export function RegistrationForm() {
               />
             </FormField>
 
-            {needsPaymentProof && (
+            {showPaymentProof && (
               <div className="mt-4 space-y-4">
                 <blockquote className="rounded-lg border border-neon-blue/30 bg-neon-blue/5 p-4 text-sm text-text-muted">
                   Para equipos sin miembros IEEE vigentes, el valor de inscripción es de{" "}
@@ -405,7 +428,7 @@ export function RegistrationForm() {
               </div>
             )}
 
-            {!needsPaymentProof && (
+            {!showPaymentProof && hasIeeeCodes && (
               <div className="mt-4 rounded-lg border border-neon-cyan/30 bg-neon-cyan/5 p-4 text-sm text-neon-cyan">
                 Inscripción gratuita — verificaremos los códigos de membresía IEEE.
               </div>

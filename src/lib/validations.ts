@@ -11,6 +11,20 @@ export const memberSchema = z.object({
   career: z.string().min(2, "Carrera requerida"),
 });
 
+/** Códigos IEEE válidos = texto no vacío distinto de N/A (inscripción gratuita). */
+export function hasValidIeeeMembershipCodes(codes?: string | null) {
+  const normalized = (codes ?? "").trim().toUpperCase();
+  return normalized.length > 0 && normalized !== "N/A";
+}
+
+/**
+ * Comprobante obligatorio solo si el equipo NO tiene códigos IEEE.
+ * (Alineado al texto del formulario: "solo si no posee miembros IEEE")
+ */
+export function needsPaymentProof(ieeeMembershipCodes?: string | null) {
+  return !hasValidIeeeMembershipCodes(ieeeMembershipCodes);
+}
+
 export const registrationSchema = z
   .object({
     belongsToIeeeBranch: z.boolean(),
@@ -20,19 +34,25 @@ export const registrationSchema = z
     otherInstitution: z.string().optional(),
     category: z.enum(categoryIds, { message: "Selecciona una categoría" }),
     teamName: z.string().min(2, "Nombre del equipo requerido"),
-    teamSize: z.number().int().min(2).max(4),
+    teamSize: z.coerce.number().int().min(2).max(4),
     members: z
       .array(memberSchema)
       .min(2, "Mínimo 2 integrantes")
       .max(4, "Máximo 4 integrantes"),
     contactEmail: z.string().email("Correo de contacto inválido"),
     ieeeMembershipCodes: z.string().min(1, "Indica códigos IEEE o escribe N/A"),
-    paymentProofUrl: z.string().optional(),
+    paymentProofUrl: z
+      .string()
+      .optional()
+      .transform((value) => {
+        const trimmed = value?.trim() ?? "";
+        return trimmed.length > 0 ? trimmed : undefined;
+      }),
     hearAbout: z.enum(hearAboutOptions, {
       message: "Indica cómo te enteraste del evento",
     }),
     comments: z.string().optional(),
-    acceptsTerms: z.literal(true, {
+    acceptsTerms: z.boolean().refine((value) => value === true, {
       message: "Debes aceptar los términos de participación",
     }),
   })
@@ -58,16 +78,25 @@ export const registrationSchema = z
       });
     }
 
-    const codes = data.ieeeMembershipCodes.trim().toUpperCase();
-    const hasIeee = codes !== "N/A" && codes.length > 0;
-
-    if (!data.belongsToIeeeBranch || !hasIeee) {
+    if (needsPaymentProof(data.ieeeMembershipCodes)) {
       if (!data.paymentProofUrl) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Comprobante de registro administrativo obligatorio si no hay miembros IEEE",
+          message:
+            "Debes subir el comprobante de pago ($15 USD) si no tienes códigos de membresía IEEE",
           path: ["paymentProofUrl"],
         });
+      } else {
+        try {
+          // eslint-disable-next-line no-new
+          new URL(data.paymentProofUrl);
+        } catch {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La URL del comprobante no es válida. Vuelve a subir el archivo.",
+            path: ["paymentProofUrl"],
+          });
+        }
       }
     }
   });

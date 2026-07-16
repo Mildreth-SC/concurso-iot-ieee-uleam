@@ -44,8 +44,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ url });
   } catch (error) {
     console.error("Upload error:", error);
+    const message =
+      error instanceof Error ? error.message : "Error al subir archivo";
     return NextResponse.json(
-      { error: "Error al subir archivo. Verifica la configuración de Supabase Storage." },
+      {
+        error: `Error al subir archivo: ${message}. Si el bucket no existe, ejecuta supabase/schema.sql o revisa Storage en Supabase.`,
+      },
       { status: 500 },
     );
   }
