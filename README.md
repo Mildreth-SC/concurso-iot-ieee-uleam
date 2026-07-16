@@ -8,7 +8,7 @@ Landing page y formulario de inscripción para el concurso nacional IoT de la Ra
 - **React Hook Form** + Zod
 - **Supabase** — inscripciones (Postgres), contenido del sitio y archivos (Storage)
 - **Resend** — emails de confirmación
-- **Cloudflare Workers** (adaptador OpenNext) — hosting
+- **Vercel** (recomendado) o Cloudflare Workers — hosting
 
 ## Desarrollo local
 
@@ -35,39 +35,37 @@ Crea un archivo `.env.local` (no se sube al repo):
 
 ## Supabase (base de datos + storage)
 
-1. Crea un proyecto en [supabase.com](https://supabase.com).
+1. Crea un proyecto en [supabase.com](https://supabase.com) (o usa el que ya tienes).
 2. **SQL Editor → New query**: pega y ejecuta todo `supabase/schema.sql`.
    Esto crea la tabla `registrations`, la tabla `site_content` y el bucket público `site-assets`.
-3. Copia **Project URL** y **service_role key** (Project Settings → API) a `.env.local`.
+3. Copia **Project URL** y **service_role key** (Project Settings → API) a `.env.local` y a Vercel.
 
-## Deploy en Cloudflare Workers
+## Deploy en Vercel (recomendado)
 
-El proyecto usa el adaptador [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare).
+Misma base de datos Supabase. Build: `npm run build` (= `next build`).
 
-### Opción A — Desde el dashboard (recomendado)
+1. Entra a [vercel.com](https://vercel.com) e inicia sesión con **GitHub**.
+2. **Add New… → Project**.
+3. Importa el repo: `Mildreth-SC/concurso-iot-ieee-uleam` (o el que uses).
+4. Framework: **Next.js** (lo detecta solo).
+5. En **Environment Variables** añade todas las variables de la tabla de arriba
+   (las mismas de tu `.env.local`).
+6. **Deploy**.
 
-1. Sube este repo a GitHub.
-2. En [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create → Import a repository**.
-3. Framework: **Next.js**. Deja que detecte la configuración (`wrangler.jsonc`).
-4. Comandos de build (importante):
-   - **Build command:** `npm run cf:build` (OpenNext llama internamente a `next build`)
-   - **Deploy command:** `npx wrangler deploy`
-   - No uses `npm run build` como comando de Cloudflare: OpenNext también ejecuta `npm run build` y se crea un bucle infinito.
-5. En **Build variables and secrets** añade TODAS las variables de entorno
-   (incluida `NEXT_PUBLIC_SUPABASE_URL` para que el build las tenga).
-6. Deploy. Obtendrás una URL `*.workers.dev` gratuita.
+URL típica: `https://concurso-iot-ieee-uleam.vercel.app`  
+(ese dominio **no** muestra tu cuenta de GitHub).
 
-### Opción B — Desde tu máquina
+### Dominio personalizado en Vercel
 
-```bash
-npx wrangler login
-npm run deploy
-```
+1. Proyecto → **Settings → Domains**.
+2. Agrega tu dominio (comprado o gratuito externo).
 
-### Comandos útiles
+## Deploy en Cloudflare Workers (opcional)
 
-- `npm run preview` — corre la app en el runtime de Workers localmente (más fiel a producción).
-- `npm run deploy` — build + deploy a Cloudflare.
+1. En Cloudflare → Import repository.
+2. **Build command:** `npm run cf:build`
+3. **Deploy command:** `npx wrangler deploy`
+4. Añade las mismas variables de entorno.
 
 ## Panel administrativo
 
