@@ -45,7 +45,7 @@ export function OrganizerFooterStrip() {
   }, []);
 
   return (
-    <section className="border-t border-neon-cyan/15 bg-[#070b15] px-4 py-14">
+    <section className="border-t border-neon-cyan/15 bg-white px-4 py-14">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 text-center">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-neon-cyan">
