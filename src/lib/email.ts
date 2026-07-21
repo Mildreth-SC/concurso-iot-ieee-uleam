@@ -1,16 +1,20 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { CONTACT_EMAIL, EVENT, CATEGORIES } from "./constants";
 import type { RegistrationFormData } from "./validations";
 
 const PORTAL_BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://concurso-iot-ieee-uleam.vercel.app";
 
-function getResend() {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new Error("RESEND_API_KEY no configurada.");
+function getTransporter() {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) {
+    throw new Error("Credenciales de Gmail no configuradas (GMAIL_USER y GMAIL_APP_PASSWORD).");
   }
-  return new Resend(apiKey);
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass },
+  });
 }
 
 function categoryLabel(id: string) {
@@ -170,17 +174,17 @@ function buildEmailHtml(data: RegistrationFormData & { registrationCode?: string
 }
 
 export async function sendConfirmationEmails(data: RegistrationFormData & { registrationCode?: string }) {
-  const resend = getResend();
-  const from = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+  const transporter = getTransporter();
+  const from = `"Concurso IoT ULEAM 2026" <${process.env.GMAIL_USER}>`;
   const html = buildEmailHtml(data);
   const subject = "Inscripción recibida — I Concurso Nacional IoT ULEAM 2026";
   const receipt = registrationSummary(data);
   const attachment = {
     filename: `comprobante-${data.teamName.replace(/\s+/g, "-").toLowerCase()}.txt`,
-    content: Buffer.from(receipt, "utf8").toString("base64"),
+    content: Buffer.from(receipt, "utf8"),
   };
 
-  await resend.emails.send({
+  await transporter.sendMail({
     from,
     to: CONTACT_EMAIL,
     subject: `[Nueva inscripción] ${data.teamName}`,
@@ -188,7 +192,7 @@ export async function sendConfirmationEmails(data: RegistrationFormData & { regi
     attachments: [attachment],
   });
 
-  await resend.emails.send({
+  await transporter.sendMail({
     from,
     to: data.contactEmail,
     subject,
