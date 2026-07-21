@@ -36,12 +36,13 @@ alter table registrations add column if not exists paper_url text;
 
 create unique index if not exists registrations_registration_code_key on registrations (registration_code);
 
-create index registrations_created_at_idx on registrations (created_at desc);
-create index registrations_category_idx on registrations (category);
+create index if not exists registrations_created_at_idx on registrations (created_at desc);
+create index if not exists registrations_category_idx on registrations (category);
 
 alter table registrations enable row level security;
 
 -- Acceso total para el service role (backend)
+drop policy if exists "Service role full access registrations" on registrations;
 create policy "Service role full access registrations"
   on registrations
   for all
@@ -51,6 +52,7 @@ create policy "Service role full access registrations"
 -- Lectura pública de columnas no sensibles por registration_code
 -- (el portal de equipo usa el service role desde el backend,
 --  pero esta policy permite acceso anónimo si alguna vez se expone como API pública)
+drop policy if exists "Public read by registration_code" on registrations;
 create policy "Public read by registration_code"
   on registrations
   for select
@@ -68,6 +70,7 @@ create table if not exists site_content (
 
 alter table site_content enable row level security;
 
+drop policy if exists "Service role full access site_content" on site_content;
 create policy "Service role full access site_content"
   on site_content
   for all
