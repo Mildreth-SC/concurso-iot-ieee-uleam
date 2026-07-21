@@ -4,7 +4,7 @@ import { SectionHeading, NeonCard } from "@/components/ui/primitives";
 
 export function Organizers() {
   return (
-    <section id="organizadores" className="px-4 py-20 scroll-mt-24">
+    <section id="organizadores" className="bg-white px-4 py-20 scroll-mt-24">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           title="Quiénes organizan"

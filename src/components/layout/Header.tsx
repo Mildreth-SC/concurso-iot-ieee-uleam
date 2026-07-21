@@ -26,7 +26,7 @@ export function Header() {
           IoT ULEAM <span className="text-text-primary">2026</span>
         </Link>
 
-        <nav className="hidden items-center gap-5 lg:flex">
+        <nav className="hidden items-center gap-7 lg:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}

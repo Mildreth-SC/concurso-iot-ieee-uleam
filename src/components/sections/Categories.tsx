@@ -82,7 +82,7 @@ export function Categories() {
                       <span className="category-icon-pulse" />
                     </div>
                     <div className="text-right">
-                      <span className="block font-mono text-[9px] tracking-[0.22em] text-white/45">
+                      <span className="block font-mono text-[9px] tracking-[0.22em] text-neon-blue/50">
                         NODE
                       </span>
                       <strong className="category-number font-display text-2xl">
@@ -94,11 +94,11 @@ export function Categories() {
                   <p className="category-signal mt-7 font-mono text-[9px] uppercase tracking-[0.25em]">
                     {visual.signal}
                   </p>
-                  <h3 className="mt-2 font-display text-lg font-bold leading-snug text-white sm:text-xl">
+                  <h3 className="mt-2 font-display text-lg font-bold leading-snug text-neon-blue sm:text-xl">
                     {cat.shortName}
                   </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[#9eb0c9]">{cat.name}</p>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-[#b8c7dd]">
+                  <p className="mt-2 text-xs leading-relaxed text-text-muted">{cat.name}</p>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-text-muted">
                     {cat.description}
                   </p>
 
