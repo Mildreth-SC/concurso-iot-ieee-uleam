@@ -10,7 +10,7 @@ function OrganizerLogo({ organizer }: { organizer: OrganizerItem }) {
 
   return (
     <div className="organizer-logo-card">
-      <div className="relative flex h-20 items-center justify-center">
+      <div className="relative flex h-32 w-full items-center justify-center">
         {!failed && src ? (
           <Image
             src={src}
@@ -18,7 +18,7 @@ function OrganizerLogo({ organizer }: { organizer: OrganizerItem }) {
             fill
             unoptimized
             sizes="(max-width: 768px) 45vw, 20vw"
-            className="object-contain p-2"
+            className="object-contain p-1"
             onError={() => setFailed(true)}
           />
         ) : (
@@ -27,7 +27,7 @@ function OrganizerLogo({ organizer }: { organizer: OrganizerItem }) {
           </span>
         )}
       </div>
-      <p className="mt-3 text-center text-xs leading-relaxed text-text-muted">
+      <p className="mt-4 text-center text-sm font-semibold leading-relaxed text-text-primary">
         {organizer.name}
       </p>
     </div>

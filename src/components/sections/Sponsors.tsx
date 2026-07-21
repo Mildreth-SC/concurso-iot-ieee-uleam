@@ -41,14 +41,14 @@ export function Sponsors() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sponsors.map((sponsor) => (
               <NeonCard key={sponsor.id} className="flex items-start gap-4">
-                <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border border-neon-cyan/20 bg-white/5">
+                <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl border border-neon-cyan/20 bg-white/5">
                   {sponsor.logo ? (
                     <Image
                       src={sponsor.logo.split("?")[0]}
                       alt={sponsor.name}
                       fill
                       unoptimized
-                      className="object-contain p-2"
+                      className="object-contain p-1"
                     />
                   ) : (
                     <span className="absolute inset-0 flex items-center justify-center font-display text-xs font-bold text-neon-cyan">
