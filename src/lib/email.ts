@@ -184,19 +184,20 @@ export async function sendConfirmationEmails(data: RegistrationFormData & { regi
     content: Buffer.from(receipt, "utf8"),
   };
 
-  await transporter.sendMail({
-    from,
-    to: CONTACT_EMAIL,
-    subject: `[Nueva inscripción] ${data.teamName}`,
-    html: `<p>Nueva inscripción recibida.</p>${html}`,
-    attachments: [attachment],
-  });
-
-  await transporter.sendMail({
-    from,
-    to: data.contactEmail,
-    subject,
-    html,
-    attachments: [attachment],
-  });
+  await Promise.all([
+    transporter.sendMail({
+      from,
+      to: CONTACT_EMAIL,
+      subject: `[Nueva inscripción] ${data.teamName}`,
+      html: `<p>Nueva inscripción recibida.</p>${html}`,
+      attachments: [attachment],
+    }),
+    transporter.sendMail({
+      from,
+      to: data.contactEmail,
+      subject,
+      html,
+      attachments: [attachment],
+    }),
+  ]);
 }
