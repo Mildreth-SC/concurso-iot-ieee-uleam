@@ -14,8 +14,10 @@ export const EVENT = {
   presentationDate: "Miércoles 11 de noviembre de 2026",
   presentationLocation: "ULEAM, Manta",
   arrivalDate: "Martes 10 de noviembre de 2026",
-  registrationOpen: "25 de mayo de 2026",
+  registrationOpen: "15 de julio de 2026",
   registrationClose: "11 de octubre de 2026 a las 23:59",
+  /** ISO datetime de cierre de entrega de paper — usado por el portal de equipo */
+  paperDeadline: "2026-10-11T23:59:59-05:00",
   ieeeCost: "Gratis",
   nonIeeeCost: "$15.00 USD por equipo",
 } as const;
@@ -160,20 +162,20 @@ export const TEAM_SIZES = [2, 3, 4] as const;
 
 export const TIMELINE = [
   {
-    date: "25 mayo 2026",
-    start: "2026-05-25T00:00:00-05:00",
-    end: "2026-05-25T23:59:59-05:00",
+    date: "15 jul 2026",
+    start: "2026-07-15T00:00:00-05:00",
+    end: "2026-07-15T23:59:59-05:00",
     title: "Apertura de inscripciones",
     description: "Inicia el periodo de registro y desarrollo.",
-    action: "El portal recibe oficialmente las primeras inscripciones.",
+    action: "El portal recibe oficialmente las primeras inscripciones. Cada equipo recibe por correo su código único de acceso al panel de equipo.",
   },
   {
-    date: "25 mayo – 11 oct",
-    start: "2026-05-25T00:00:00-05:00",
+    date: "15 jul – 11 oct",
+    start: "2026-07-15T00:00:00-05:00",
     end: "2026-10-11T23:59:59-05:00",
     title: "Desarrollo del proyecto",
-    description: "Construcción del prototipo e informe técnico IEEE.",
-    action: "Diseña, prueba y documenta tu solución IoT. Esta es la fase de trabajo activo.",
+    description: "Construcción del prototipo, inscripción del tema, tutor y entrega del paper.",
+    action: "Diseña, prueba y documenta tu solución IoT. Usa tu código único para acceder al panel y completar tema, tutor y subir el paper antes del cierre.",
   },
   {
     date: "11 oct 2026, 23:59",
@@ -285,11 +287,13 @@ export const BASES_SECTIONS = [
   {
     title: "5. Inscripción y costos",
     items: [
+      "Apertura de inscripciones: 15 de julio de 2026.",
       "Miembros IEEE vigentes: inscripción gratuita (número de membresía obligatorio).",
       "Equipos sin miembros IEEE: $15.00 USD por equipo.",
       "Pago a Banco Pichincha, cuenta ahorro 2209748595, titular Muñoz Delgado Jordy Josué.",
       "Sin comprobante de pago (cuando aplique), la inscripción no será validada.",
-      "Cierre de inscripciones: 11 de octubre de 2026 a las 23:59.",
+      "Al inscribirse, cada equipo recibe un código único para acceder al panel de equipo (tema, tutor y paper).",
+      "Cierre de inscripciones y entrega de paper: 11 de octubre de 2026 a las 23:59.",
     ],
   },
   {

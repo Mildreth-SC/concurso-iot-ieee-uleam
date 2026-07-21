@@ -23,16 +23,20 @@ import type { OrganizerItem, SponsorItem } from "@/lib/site-content";
 type Registration = {
   id: string;
   created_at: string;
+  registration_code: string;
   team_name: string;
   category: string;
   belongs_to_ieee_branch: boolean;
   representing_institution: string;
   other_institution?: string | null;
+  project_topic?: string | null;
+  tutor_name?: string | null;
   team_size: number;
   members: Array<{ name: string; cedula: string; career: string }>;
   contact_email: string;
   ieee_membership_codes: string;
   payment_proof_url?: string | null;
+  paper_url?: string | null;
   hear_about: string;
   comments?: string | null;
 };
@@ -61,6 +65,10 @@ export function AdminPanel() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [selected, setSelected] = useState<Registration | null>(null);
+  const [codeLookup, setCodeLookup] = useState("");
+  const [projectTopic, setProjectTopic] = useState("");
+  const [tutorName, setTutorName] = useState("");
+  const [paperUrl, setPaperUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,8 +118,25 @@ export function AdminPanel() {
   }, []);
 
   useEffect(() => {
-    void loadAll();
+    let active = true;
+
+    const initialize = async () => {
+      if (!active) return;
+      await loadAll();
+    };
+
+    void initialize();
+
+    return () => {
+      active = false;
+    };
   }, [loadAll]);
+
+  useEffect(() => {
+    setProjectTopic(selected?.project_topic ?? "");
+    setTutorName(selected?.tutor_name ?? "");
+    setPaperUrl(selected?.paper_url ?? "");
+  }, [selected]);
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -156,6 +181,94 @@ export function AdminPanel() {
     await fetch("/api/admin/login", { method: "DELETE" });
     setAuthenticated(false);
     setRegistrations([]);
+  }
+
+  async function loadByCode(code: string) {
+    const normalized = code.trim().toUpperCase();
+    if (!normalized) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/admin/registrations/${encodeURIComponent(normalized)}`, {
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "No se encontró el código");
+      setSelected(data.registration ?? null);
+      setCodeLookup(normalized);
+      setTab("inscritos");
+    } catch (err) {
+      setSelected(null);
+      setError(err instanceof Error ? err.message : "No se encontró el código");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveSelectedRegistration(overrides?: {
+    projectTopic?: string | null;
+    tutorName?: string | null;
+    paperUrl?: string | null;
+  }) {
+    if (!selected) return;
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await fetch(
+        `/api/admin/registrations/${encodeURIComponent(selected.registration_code)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectTopic: (overrides?.projectTopic ?? projectTopic.trim()) || null,
+            tutorName: (overrides?.tutorName ?? tutorName.trim()) || null,
+            paperUrl: (overrides?.paperUrl ?? paperUrl.trim()) || null,
+          }),
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "No se pudo guardar");
+      setSelected(data.registration ?? null);
+      setRegistrations((current) =>
+        current.map((item) =>
+          item.registration_code === selected.registration_code ? data.registration : item,
+        ),
+      );
+      setSuccess("Registro actualizado correctamente.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo guardar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeSelectedRegistration() {
+    if (!selected) return;
+    const confirmed = window.confirm(
+      `¿Eliminar por completo el registro ${selected.registration_code}? Esta acción no se puede deshacer.`,
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/admin/registrations/${encodeURIComponent(selected.registration_code)}`,
+        { method: "DELETE" },
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "No se pudo eliminar");
+      setRegistrations((current) =>
+        current.filter((item) => item.registration_code !== selected.registration_code),
+      );
+      setSelected(null);
+      setSuccess("Registro eliminado.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo eliminar");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function persistContent(nextOrganizers: OrganizerItem[], nextSponsors: SponsorItem[]) {
@@ -268,22 +381,30 @@ export function AdminPanel() {
   function exportCsv() {
     const headers = [
       "Fecha",
+      "Código",
       "Equipo",
       "Categoría",
       "Institución",
+      "Tema",
+      "Tutor",
       "Integrantes",
       "Correo",
       "Códigos IEEE",
+      "Paper",
       "Comprobante",
     ];
     const rows = filtered.map((registration) => [
       registration.created_at,
+      registration.registration_code,
       registration.team_name,
       categoryName(registration.category),
       registration.other_institution || registration.representing_institution,
+      registration.project_topic ?? "",
+      registration.tutor_name ?? "",
       (registration.members ?? []).map((member) => member.name).join(" | "),
       registration.contact_email,
       registration.ieee_membership_codes,
+      registration.paper_url ?? "",
       registration.payment_proof_url ?? "",
     ]);
     const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
@@ -322,7 +443,7 @@ export function AdminPanel() {
               <button
                 type="submit"
                 disabled={loading}
-                className="neon-gradient w-full rounded-lg px-4 py-3 font-semibold text-bg-dark disabled:opacity-50"
+                className="neon-gradient w-full rounded-lg px-4 py-3 font-semibold text-white disabled:opacity-50"
               >
                 {loading ? "Verificando..." : "Entrar al panel"}
               </button>
@@ -359,7 +480,7 @@ export function AdminPanel() {
                 onClick={() => setTab(id)}
                 className={`rounded-full px-4 py-2 text-sm ${
                   tab === id
-                    ? "bg-neon-cyan text-bg-dark"
+                    ? "bg-neon-cyan text-slate-900"
                     : "border border-neon-cyan/30 text-neon-cyan"
                 }`}
               >
@@ -408,6 +529,29 @@ export function AdminPanel() {
 
         {tab === "inscritos" && (
           <>
+            <div className="mb-6 rounded-3xl border border-neon-cyan/20 bg-white/70 p-5 shadow-[0_24px_80px_rgba(13,47,102,0.08)] backdrop-blur-xl">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+                <label className="flex-1">
+                  <span className="mb-2 block text-xs uppercase tracking-[0.22em] text-neon-blue">
+                    Buscar por código único
+                  </span>
+                  <input
+                    value={codeLookup}
+                    onChange={(event) => setCodeLookup(event.target.value)}
+                    className={inputClassName}
+                    placeholder="Ej: IOT-A1B2C3"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => void loadByCode(codeLookup)}
+                  className="rounded-full bg-neon-blue px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(30,110,255,0.28)]"
+                >
+                  Abrir grupo
+                </button>
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-3">
               <NeonCard>
                 <Users className="h-5 w-5 text-neon-cyan" />
@@ -461,7 +605,7 @@ export function AdminPanel() {
               <button
                 type="button"
                 onClick={exportCsv}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-neon-cyan px-4 py-2.5 text-sm font-semibold text-bg-dark"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-neon-cyan px-4 py-2.5 text-sm font-semibold text-slate-900"
               >
                 <Download className="h-4 w-4" />
                 Exportar CSV
@@ -472,6 +616,7 @@ export function AdminPanel() {
               <table className="w-full min-w-[1050px] text-left text-sm">
                 <thead className="bg-neon-cyan/8 text-xs uppercase tracking-wider text-neon-cyan">
                   <tr>
+                    <th className="px-4 py-4">Código</th>
                     <th className="px-4 py-4">Equipo</th>
                     <th className="px-4 py-4">Categoría</th>
                     <th className="px-4 py-4">Institución</th>
@@ -483,7 +628,10 @@ export function AdminPanel() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filtered.map((registration) => (
-                    <tr key={registration.id} className="bg-bg-dark/45 hover:bg-neon-cyan/5">
+                    <tr key={registration.id} className="bg-white/75 hover:bg-neon-cyan/5">
+                      <td className="px-4 py-4 font-mono text-xs text-neon-blue">
+                        {registration.registration_code}
+                      </td>
                       <td className="px-4 py-4">
                         <p className="font-medium text-text-primary">{registration.team_name}</p>
                         <p className="mt-1 text-xs text-text-muted">
@@ -597,6 +745,14 @@ export function AdminPanel() {
                     </div>
                     <div className="rounded-xl border border-neon-cyan/15 p-4">
                       <p className="text-xs uppercase tracking-wider text-text-muted">
+                        Código único
+                      </p>
+                      <p className="mt-1 font-mono text-text-primary">
+                        {selected.registration_code}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-neon-cyan/15 p-4">
+                      <p className="text-xs uppercase tracking-wider text-text-muted">
                         Rama IEEE
                       </p>
                       <p className="mt-1 text-text-primary">
@@ -649,6 +805,74 @@ export function AdminPanel() {
                         Tamaño del equipo
                       </p>
                       <p className="mt-1 text-text-primary">{selected.team_size}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-neon-cyan/20 bg-white/70 p-4">
+                    <p className="text-xs uppercase tracking-wider text-neon-blue">Proyecto</p>
+                    <div className="mt-3 grid gap-4">
+                      <label className="space-y-2">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-text-muted">
+                          Tema del proyecto
+                        </span>
+                        <input
+                          className={inputClassName}
+                          value={projectTopic}
+                          onChange={(event) => setProjectTopic(event.target.value)}
+                          placeholder="Tema elegido del proyecto"
+                        />
+                      </label>
+                      <label className="space-y-2">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-text-muted">
+                          Tutor o docente
+                        </span>
+                        <input
+                          className={inputClassName}
+                          value={tutorName}
+                          onChange={(event) => setTutorName(event.target.value)}
+                          placeholder="Nombre del tutor o docente"
+                        />
+                      </label>
+                      <label className="space-y-2">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-text-muted">
+                          Paper del proyecto
+                        </span>
+                        <input
+                          className={inputClassName}
+                          value={paperUrl}
+                          onChange={(event) => setPaperUrl(event.target.value)}
+                          placeholder="URL del paper o deja vacío para eliminarlo"
+                        />
+                      </label>
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => void saveSelectedRegistration()}
+                          disabled={saving}
+                          className="rounded-full bg-neon-blue px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                        >
+                          Guardar cambios
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaperUrl("");
+                            void saveSelectedRegistration({ paperUrl: null });
+                          }}
+                          disabled={saving}
+                          className="rounded-full border border-neon-blue/30 px-4 py-2 text-sm text-neon-blue disabled:opacity-50"
+                        >
+                          Eliminar paper
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void removeSelectedRegistration()}
+                          disabled={saving}
+                          className="rounded-full border border-red-400/30 px-4 py-2 text-sm text-red-500 disabled:opacity-50"
+                        >
+                          Eliminar registro
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -815,7 +1039,7 @@ export function AdminPanel() {
                 />
                 <button
                   type="submit"
-                  className="neon-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-bg-dark md:col-span-2"
+                  className="neon-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white md:col-span-2"
                 >
                   <Plus className="h-4 w-4" />
                   Agregar sponsor

@@ -40,6 +40,8 @@ export const registrationSchema = z
     otherInstitution: z.string().optional(),
     category: z.enum(categoryIds, { message: "Selecciona una categoría" }),
     teamName: z.string().min(2, "Nombre del equipo requerido"),
+    projectTopic: z.string().min(3, "Tema del proyecto requerido"),
+    tutorName: z.string().min(3, "Nombre del tutor o docente requerido"),
     teamSize: z.number().int().min(2).max(4),
     members: z
       .array(memberSchema)
@@ -48,6 +50,7 @@ export const registrationSchema = z
     contactEmail: z.string().email("Correo de contacto inválido"),
     ieeeMembershipCodes: z.string().min(1, "Indica códigos IEEE o escribe N/A"),
     paymentProofUrl: z.string().optional(),
+    paperUrl: z.string().url("La URL del paper no es válida"),
     hearAbout: z.enum(hearAboutOptions, {
       message: "Indica cómo te enteraste del evento",
     }),
@@ -115,5 +118,12 @@ export const registrationSchema = z
     }
   });
 
+export const registrationUpdateSchema = z.object({
+  projectTopic: z.string().min(3).nullable().optional(),
+  tutorName: z.string().min(3).nullable().optional(),
+  paperUrl: z.string().url("La URL del paper no es válida").nullable().optional(),
+});
+
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
 export type MemberFormData = z.infer<typeof memberSchema>;
+export type RegistrationUpdateData = z.infer<typeof registrationUpdateSchema>;

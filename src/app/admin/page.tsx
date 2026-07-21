@@ -13,7 +13,7 @@ export default function AdminPage() {
       <PageBanner
         node="CONTROL CENTER · ACCESO RESTRINGIDO"
         title="Panel de inscritos"
-        description="Consulta, filtra y exporta las inscripciones recibidas por el comité organizador."
+        description="Consulta, busca por código único, edita tema/tutor/paper y exporta las inscripciones recibidas por el comité organizador."
       />
       <AdminPanel />
     </>

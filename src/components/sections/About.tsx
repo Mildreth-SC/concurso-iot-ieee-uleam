@@ -31,7 +31,7 @@ export function About() {
               </a>
               <a
                 href="/inscripcion"
-                className="tech-button rounded-full px-5 py-2 text-sm font-bold text-bg-dark"
+                className="tech-button rounded-full px-5 py-2 text-sm font-bold text-white"
               >
                 Inscribir equipo
               </a>

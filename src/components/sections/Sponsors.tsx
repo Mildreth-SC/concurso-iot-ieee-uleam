@@ -119,7 +119,7 @@ export function BecomeSponsor() {
             </div>
             <a
               href={`mailto:${CONTACT_EMAIL}?subject=Quiero%20ser%20sponsor%20-%20Concurso%20IoT%20ULEAM%202026`}
-              className="tech-button inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold text-bg-dark"
+              className="tech-button inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-bold text-white"
             >
               Contactar organización
             </a>

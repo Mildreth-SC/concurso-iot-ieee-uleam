@@ -10,6 +10,8 @@ type FileUploadProps = {
   onChange: (url: string) => void;
   error?: string;
   required?: boolean;
+  folder?: string;
+  filename?: string;
 };
 
 export function FileUpload({
@@ -19,6 +21,8 @@ export function FileUpload({
   onChange,
   error,
   required,
+  folder = "payment-proofs",
+  filename,
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -32,6 +36,8 @@ export function FileUpload({
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", folder);
+      if (filename) formData.append("filename", filename);
 
       const res = await fetch("/api/upload", {
         method: "POST",

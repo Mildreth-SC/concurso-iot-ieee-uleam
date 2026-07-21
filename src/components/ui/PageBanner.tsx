@@ -11,8 +11,8 @@ export function PageBanner({
   description: string;
 }) {
   return (
-    <section className="relative overflow-hidden border-b border-neon-cyan/15 px-4 py-14 sm:py-20">
-      <div className="hero-aurora pointer-events-none absolute inset-0 opacity-60" />
+    <section className="relative overflow-hidden border-b border-neon-cyan/15 bg-white/55 px-4 py-14 sm:py-20">
+      <div className="hero-aurora pointer-events-none absolute inset-0 opacity-55" />
       <div className="relative mx-auto max-w-7xl">
         <Link
           href="/"

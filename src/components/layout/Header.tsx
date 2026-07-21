@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/inscripcion", label: "Inscripción" },
   { href: "/#premios", label: "Premios" },
   { href: "/organizacion", label: "Organiza y sponsors" },
+  { href: "/portal", label: "Mi Panel" },
 ];
 
 export function Header() {
@@ -19,10 +20,10 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-neon-cyan/20 bg-bg-dark/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-neon-cyan/15 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-        <Link href="/" className="font-display text-sm font-bold tracking-wider text-neon-cyan sm:text-base">
-          IoT ULEAM <span className="text-neon-blue">2026</span>
+        <Link href="/" className="font-display text-sm font-bold tracking-wider text-neon-blue sm:text-base">
+          IoT ULEAM <span className="text-text-primary">2026</span>
         </Link>
 
         <nav className="hidden items-center gap-5 lg:flex">
@@ -31,7 +32,7 @@ export function Header() {
               key={link.href}
               href={link.href}
               className={`text-sm transition-colors hover:text-neon-cyan ${
-                pathname === link.href ? "text-neon-cyan" : "text-text-muted"
+                pathname === link.href ? "text-neon-blue" : "text-text-muted"
               }`}
             >
               {link.label}
@@ -42,7 +43,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           <Link
             href="/inscripcion"
-            className="neon-gradient rounded-full px-4 py-2 text-xs font-semibold text-bg-dark sm:text-sm"
+            className="neon-gradient rounded-full px-4 py-2 text-xs font-semibold text-white sm:text-sm"
           >
             Inscribirse
           </Link>
@@ -58,7 +59,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-neon-cyan/15 bg-bg-dark/95 px-4 py-4 lg:hidden">
+        <div className="border-t border-neon-cyan/15 bg-white/95 px-4 py-4 lg:hidden">
           <nav className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link

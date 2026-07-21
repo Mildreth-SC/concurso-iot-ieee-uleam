@@ -22,7 +22,7 @@ export default function BasesPage() {
       <div className="px-4 pb-20 text-center">
         <Link
           href="/inscripcion"
-          className="tech-button inline-flex rounded-full px-8 py-3.5 text-sm font-bold text-bg-dark"
+          className="tech-button inline-flex rounded-full px-8 py-3.5 text-sm font-bold text-white"
         >
           Continuar a inscripción
         </Link>

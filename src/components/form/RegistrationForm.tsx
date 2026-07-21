@@ -34,6 +34,7 @@ const defaultMember = { name: "", cedula: "", career: "" };
 export function RegistrationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [registrationCode, setRegistrationCode] = useState<string | null>(null);
 
   const {
     register,
@@ -50,11 +51,14 @@ export function RegistrationForm() {
       otherInstitution: "",
       category: undefined,
       teamName: "",
+        projectTopic: "",
+        tutorName: "",
       teamSize: 2,
       members: [{ ...defaultMember }, { ...defaultMember }],
       contactEmail: "",
       ieeeMembershipCodes: "",
       paymentProofUrl: "",
+        paperUrl: "",
       hearAbout: undefined,
       comments: "",
       acceptsTerms: false,
@@ -125,6 +129,7 @@ export function RegistrationForm() {
           : null;
         throw new Error(details || result.error || "Error al enviar inscripción");
       }
+      setRegistrationCode(result.registration?.registration_code ?? null);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -145,6 +150,19 @@ export function RegistrationForm() {
               Hemos recibido tu inscripción al I Concurso Nacional IoT ULEAM 2026.
               Revisaremos tu documentación y te contactaremos si falta algo.
             </p>
+            {registrationCode && (
+              <div className="mt-6 rounded-xl border border-neon-cyan/30 bg-neon-cyan/8 p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-neon-cyan">
+                  Código único de seguimiento
+                </p>
+                <p className="mt-2 font-display text-2xl font-bold text-text-primary">
+                  {registrationCode}
+                </p>
+                <p className="mt-2 text-sm text-text-muted">
+                  Guárdalo para consultar o modificar tu registro desde el panel administrativo.
+                </p>
+              </div>
+            )}
           </NeonCard>
         </div>
       </section>
@@ -306,6 +324,30 @@ export function RegistrationForm() {
               </FormField>
 
               <FormField
+                label="Tema elegido del proyecto"
+                error={errors.projectTopic?.message}
+                required
+              >
+                <input
+                  className={inputClassName}
+                  {...register("projectTopic")}
+                  placeholder="Ej: Sistema IoT para monitoreo ambiental"
+                />
+              </FormField>
+
+              <FormField
+                label="Tutor o docente responsable"
+                error={errors.tutorName?.message}
+                required
+              >
+                <input
+                  className={inputClassName}
+                  {...register("tutorName")}
+                  placeholder="Nombre completo del tutor"
+                />
+              </FormField>
+
+              <FormField
                 label="¿De cuántos integrantes está conformado su equipo?"
                 error={errors.teamSize?.message}
                 required
@@ -461,10 +503,30 @@ export function RegistrationForm() {
             )}
           </NeonCard>
 
+          {/* Paper del proyecto */}
+          <NeonCard>
+            <h3 className="mb-6 font-display text-lg font-semibold text-neon-cyan">
+              E — Paper del proyecto
+            </h3>
+            <FileUpload
+              label="Sube el paper del proyecto"
+              accept=".pdf"
+              folder="papers"
+              filename={watch("teamName") || "paper-proyecto"}
+              value={watch("paperUrl")}
+              onChange={(url) => setValue("paperUrl", url, { shouldValidate: true })}
+              error={errors.paperUrl?.message}
+              required
+            />
+            <p className="mt-4 text-sm text-text-muted">
+              El archivo debe contener el tema elegido, la descripción del proyecto y la firma o aval del tutor.
+            </p>
+          </NeonCard>
+
           {/* Extra */}
           <NeonCard>
             <h3 className="mb-6 font-display text-lg font-semibold text-neon-cyan">
-              E — Difusión y compromiso
+              F — Difusión y compromiso
             </h3>
             <FormField
               label="¿Cómo te enteraste de este evento?"
@@ -492,7 +554,7 @@ export function RegistrationForm() {
               </FormField>
             </div>
 
-            <div className="mt-6 rounded-lg border border-neon-cyan/20 bg-bg-dark/50 p-4 text-sm text-text-muted">
+            <div className="mt-6 rounded-lg border border-neon-cyan/20 bg-white/80 p-4 text-sm text-text-muted">
               <p>
                 <strong className="text-text-primary">Declaración de compromiso:</strong> Al
                 enviar este formulario, los integrantes declaran su intención de participar en

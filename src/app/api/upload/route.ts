@@ -21,6 +21,8 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const folder = String(formData.get("folder") ?? "payment-proofs");
+    const filename = String(formData.get("filename") ?? "").trim() || undefined;
 
     if (!file) {
       return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const url = await uploadPublicFile(file, "payment-proofs");
+    const url = await uploadPublicFile(file, folder, filename);
     return NextResponse.json({ url });
   } catch (error) {
     console.error("Upload error:", error);

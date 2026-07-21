@@ -77,7 +77,7 @@ export function Hero() {
           </span>
 
           <p className="mt-8 font-mono text-xs uppercase tracking-[0.32em] text-neon-cyan/75">
-            // Conectando ideas con el futuro
+            {/* Conectando ideas con el futuro */}
           </p>
 
           <h1 className="mt-4 font-display text-4xl font-bold leading-[1.08] tracking-wide sm:text-6xl lg:text-[4.4rem]">
@@ -97,13 +97,13 @@ export function Hero() {
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
             <a
               href="/inscripcion"
-              className="tech-button group relative overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold text-bg-dark sm:text-base"
+              className="tech-button group relative overflow-hidden rounded-full px-8 py-3.5 text-sm font-bold text-white sm:text-base"
             >
               <span className="relative z-10">Inscribirse</span>
             </a>
             <a
               href="/experiencia"
-              className="rounded-full border border-neon-cyan/35 bg-white/[0.02] px-8 py-3.5 text-sm font-medium text-neon-cyan backdrop-blur-sm transition-all hover:border-neon-cyan hover:bg-neon-cyan/10 sm:text-base"
+              className="rounded-full border border-neon-cyan/30 bg-white/80 px-8 py-3.5 text-sm font-medium text-neon-blue shadow-sm backdrop-blur-sm transition-all hover:border-neon-cyan hover:bg-neon-cyan/10 sm:text-base"
             >
               Explorar la experiencia
             </a>
@@ -146,7 +146,7 @@ export function Hero() {
             <span className="manta-lens manta-lens-b" />
             <span className="manta-video-noise" />
           </div>
-          <div className="mx-auto -mt-5 flex w-fit items-center gap-2 rounded-full border border-neon-cyan/20 bg-bg-dark/70 px-4 py-2 font-mono text-[10px] tracking-[0.2em] text-neon-cyan backdrop-blur-md">
+          <div className="mx-auto -mt-5 flex w-fit items-center gap-2 rounded-full border border-neon-cyan/20 bg-white/80 px-4 py-2 font-mono text-[10px] tracking-[0.2em] text-neon-blue shadow-sm backdrop-blur-md">
             <Wifi className="h-3.5 w-3.5" />
             MANTA NODE · ACTIVE
           </div>

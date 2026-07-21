@@ -94,9 +94,9 @@ export function Timeline() {
                     className={`relative z-10 col-start-1 row-start-1 flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all md:col-start-2 md:justify-self-center ${
                       status === "completed"
                         ? "border-neon-blue bg-neon-blue text-white shadow-[0_0_18px_rgba(0,102,255,.5)]"
-                        : status === "active"
-                          ? "timeline-active-node border-neon-cyan bg-neon-cyan text-bg-dark"
-                          : "border-white/20 bg-bg-dark text-text-muted"
+                          : status === "active"
+                            ? "timeline-active-node border-neon-cyan bg-neon-cyan text-slate-900"
+                            : "border-white/20 bg-white text-text-muted"
                     }`}
                   >
                     {status === "completed" ? (

@@ -31,7 +31,7 @@ export function NeonCard({
 }) {
   return (
     <div
-      className={`glow-border rounded-xl bg-[rgba(10,20,40,0.6)] p-6 backdrop-blur-sm transition-all hover:border-neon-cyan/60 hover:shadow-[0_0_30px_rgba(0,212,255,0.12)] ${className}`}
+      className={`glow-border rounded-2xl border border-white/70 bg-white/90 p-6 shadow-[0_16px_40px_rgba(12,42,84,0.08)] backdrop-blur-xl transition-all hover:border-neon-cyan/50 hover:shadow-[0_24px_50px_rgba(12,42,84,0.12)] ${className}`}
     >
       {children}
     </div>
@@ -56,7 +56,7 @@ export function NeonButton({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`neon-gradient rounded-full px-8 py-3 font-semibold text-bg-dark transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`neon-gradient rounded-full px-8 py-3 font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -87,4 +87,4 @@ export function FormField({
 }
 
 export const inputClassName =
-  "w-full rounded-lg border border-neon-cyan/25 bg-bg-dark/80 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted/60 focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan/50";
+  "w-full rounded-lg border border-neon-blue/20 bg-white px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted/60 shadow-sm focus:border-neon-cyan focus:outline-none focus:ring-1 focus:ring-neon-cyan/40";
