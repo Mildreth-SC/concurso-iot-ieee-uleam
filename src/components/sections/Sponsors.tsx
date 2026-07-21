@@ -112,7 +112,7 @@ export function BecomeSponsor() {
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm text-text-muted">
                   Cada modo de patrocinio está vinculado a un premio oficial:
-                  Oro financia 1° lugar ($300), Plata 2° lugar ($200) y Cian 3° lugar ($100)
+                  Oro financia 1° lugar ($300), Plata el 2° lugar y Cian el 3° lugar
                   por categoría. Selecciona el paquete y coordina con nosotros.
                 </p>
               </div>
