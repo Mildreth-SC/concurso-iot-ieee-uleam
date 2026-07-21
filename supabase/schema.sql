@@ -5,10 +5,9 @@
 
 -- ---------------------------------------------------------------------
 -- 1) Inscripciones
--- ---------------------------------------------------------------------
-drop table if exists registrations;
+-- (Asegúrate de NO tener 'drop table' aquí para evitar pérdida de datos)
 
-create table registrations (
+create table if not exists registrations (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
   registration_code text not null unique,
