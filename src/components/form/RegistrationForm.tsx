@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle } from "lucide-react";
@@ -32,6 +33,7 @@ import { FileUpload } from "./FileUpload";
 const defaultMember = { name: "", cedula: "", career: "" };
 
 export function RegistrationForm() {
+  const searchParams = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [registrationCode, setRegistrationCode] = useState<string | null>(null);
@@ -82,6 +84,17 @@ export function RegistrationForm() {
   const codesUpper = (ieeeMembershipCodes ?? "").trim().toUpperCase();
   const hasIeeeCodes = codesUpper !== "" && codesUpper !== "N/A";
   const showPaymentProof = needsPaymentProof(ieeeMembershipCodes);
+
+  useEffect(() => {
+    const categoryParam = searchParams.get("category");
+    if (!categoryParam) return;
+    const valid = CATEGORIES.some((c) => c.id === categoryParam);
+    if (valid) {
+      setValue("category", categoryParam as RegistrationFormData["category"], {
+        shouldValidate: true,
+      });
+    }
+  }, [searchParams, setValue]);
 
   useEffect(() => {
     const size = Number(teamSize) || 2;

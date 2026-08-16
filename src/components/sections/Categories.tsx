@@ -1,23 +1,7 @@
-import {
-  Building2,
-  HeartPulse,
-  Sprout,
-  Factory,
-  Leaf,
-  ArrowUpRight,
-  Radio,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowUpRight, Radio } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
+import { CategoryIcon } from "@/lib/category-icons";
 import { SectionHeading } from "@/components/ui/primitives";
-
-const iconMap: Record<string, LucideIcon> = {
-  building: Building2,
-  "heart-pulse": HeartPulse,
-  sprout: Sprout,
-  factory: Factory,
-  leaf: Leaf,
-};
 
 const categoryVisuals = [
   {
@@ -66,19 +50,19 @@ export function Categories() {
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
           {CATEGORIES.map((cat, index) => {
-            const Icon = iconMap[cat.icon] ?? Building2;
             const visual = categoryVisuals[index];
             return (
               <article
+                id={`cat-${cat.id}`}
                 key={cat.id}
                 data-theme={visual.theme}
-                className={`category-card group ${index < 3 ? "lg:col-span-2" : "lg:col-span-3"}`}
+                className={`category-card group scroll-mt-28 ${index < 3 ? "lg:col-span-2" : "lg:col-span-3"}`}
               >
                 <div className="category-card-grid" />
                 <div className="relative z-10 flex h-full flex-col">
                   <div className="flex items-start justify-between gap-3">
                     <div className="category-icon">
-                      <Icon className="h-7 w-7" />
+                      <CategoryIcon iconKey={cat.icon} className="h-7 w-7" />
                       <span className="category-icon-pulse" />
                     </div>
                     <div className="text-right">

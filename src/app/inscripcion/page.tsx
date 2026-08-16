@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { PageBanner } from "@/components/ui/PageBanner";
 import { RegistrationForm } from "@/components/form/RegistrationForm";
 
@@ -15,7 +16,9 @@ export default function RegistrationPage() {
         title="Conecta tu equipo"
         description="Completa la inscripción y transmite los documentos de tu proyecto a la red oficial del concurso."
       />
-      <RegistrationForm />
+      <Suspense fallback={null}>
+        <RegistrationForm />
+      </Suspense>
     </>
   );
 }

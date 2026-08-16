@@ -336,6 +336,11 @@ export const ORGANIZING_TEAM = [
     detail: "Participación, liderazgo y articulación de la comunidad tecnológica.",
   },
   {
+    role: "Organización IEEE",
+    name: "IEEE Sección Ecuador",
+    detail: "Respaldo institucional de la comunidad IEEE a nivel nacional.",
+  },
+  {
     role: "Organización académica",
     name: "Facultad de Ciencias de la Vida y Tecnologías",
     detail: "Respaldo académico y tecnológico para el desarrollo del concurso.",

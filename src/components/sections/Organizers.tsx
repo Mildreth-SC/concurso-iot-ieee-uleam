@@ -8,7 +8,7 @@ export function Organizers() {
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           title="Quiénes organizan"
-          subtitle="Una red formada por IEEE ULEAM, WIE ULEAM, la Facultad de Ciencias de la Vida y Tecnologías y la Universidad Laica Eloy Alfaro de Manabí."
+          subtitle="Una red formada por IEEE ULEAM, WIE ULEAM, IEEE Sección Ecuador, la Facultad de Ciencias de la Vida y Tecnologías y la Universidad Laica Eloy Alfaro de Manabí."
         />
 
         <NeonCard className="mb-8 overflow-hidden">
@@ -57,7 +57,7 @@ export function Organizers() {
           </div>
         </NeonCard>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {ORGANIZING_TEAM.map((member) => (
             <NeonCard key={member.name}>
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon-cyan">

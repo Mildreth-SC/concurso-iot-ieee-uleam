@@ -23,8 +23,8 @@ export function Bases() {
             </div>
           </div>
           <a
-            href="/bases-concurso-iot-uleam-2026.pdf"
-            download
+            href="/api/bases/pdf"
+            download="bases-concurso-iot-uleam-2026.pdf"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-neon-cyan/40 px-5 py-2.5 text-sm font-medium text-neon-cyan transition-colors hover:bg-neon-cyan/10"
           >
             <FileDown className="h-4 w-4" />

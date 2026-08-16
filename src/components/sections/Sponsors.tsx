@@ -2,10 +2,49 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Handshake, Sparkles, Mail } from "lucide-react";
+import { Handshake, Sparkles, Mail, Trophy, Medal, Award, Check, Users } from "lucide-react";
 import { CONTACT_EMAIL, SPONSOR_TIERS } from "@/lib/constants";
 import { SectionHeading, NeonCard } from "@/components/ui/primitives";
+import { HorizontalMarquee } from "@/components/ui/HorizontalMarquee";
 import type { SponsorItem } from "@/lib/site-content";
+
+const TIER_ICON = {
+  oro: Trophy,
+  plata: Medal,
+  cian: Award,
+} as const;
+
+function SponsorMarqueeCard({ sponsor }: { sponsor: SponsorItem }) {
+  return (
+    <div className="sponsor-marquee-card organizer-logo-card flex items-center gap-4 p-4">
+      <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-neon-cyan/20 bg-white">
+        {sponsor.logo ? (
+          <Image
+            src={sponsor.logo.split("?")[0]}
+            alt={sponsor.name}
+            fill
+            unoptimized
+            className="object-contain p-1"
+          />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center font-display text-xs font-bold text-neon-cyan">
+            {sponsor.name.slice(0, 3).toUpperCase()}
+          </span>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-neon-cyan">
+          <Handshake className="h-3 w-3 shrink-0" />
+          {sponsor.tier}
+        </p>
+        <h3 className="mt-1 truncate font-display text-base font-semibold text-text-primary">
+          {sponsor.name}
+        </h3>
+        <p className="mt-1 line-clamp-2 text-xs text-text-muted">{sponsor.description}</p>
+      </div>
+    </div>
+  );
+}
 
 export function Sponsors() {
   const [sponsors, setSponsors] = useState<SponsorItem[]>([]);
@@ -27,7 +66,10 @@ export function Sponsors() {
 
         {sponsors.length === 0 ? (
           <NeonCard className="text-center">
-            <p className="text-sm text-text-muted">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-neon-cyan/25 bg-neon-cyan/5">
+              <Users className="h-6 w-6 text-neon-cyan" />
+            </div>
+            <p className="mt-4 text-sm text-text-muted">
               Pronto se publicarán aquí los sponsors que se sumen al concurso.
             </p>
             <a
@@ -38,47 +80,11 @@ export function Sponsors() {
             </a>
           </NeonCard>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <HorizontalMarquee duration={26} repeat={3}>
             {sponsors.map((sponsor) => (
-              <NeonCard key={sponsor.id} className="flex items-start gap-4">
-                <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl border border-neon-cyan/20 bg-white/5">
-                  {sponsor.logo ? (
-                    <Image
-                      src={sponsor.logo.split("?")[0]}
-                      alt={sponsor.name}
-                      fill
-                      unoptimized
-                      className="object-contain p-1"
-                    />
-                  ) : (
-                    <span className="absolute inset-0 flex items-center justify-center font-display text-xs font-bold text-neon-cyan">
-                      {sponsor.name.slice(0, 3).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon-cyan">
-                    {sponsor.tier}
-                  </p>
-                  <h3 className="mt-1 font-display text-lg font-semibold text-text-primary">
-                    {sponsor.website ? (
-                      <a
-                        href={sponsor.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-neon-cyan"
-                      >
-                        {sponsor.name}
-                      </a>
-                    ) : (
-                      sponsor.name
-                    )}
-                  </h3>
-                  <p className="mt-2 text-sm text-text-muted">{sponsor.description}</p>
-                </div>
-              </NeonCard>
+              <SponsorMarqueeCard key={sponsor.id} sponsor={sponsor} />
             ))}
-          </div>
+          </HorizontalMarquee>
         )}
 
         <p className="mt-6 text-center text-sm text-text-muted">
@@ -127,54 +133,58 @@ export function BecomeSponsor() {
         </NeonCard>
 
         <div className="grid gap-5 lg:grid-cols-3">
-          {SPONSOR_TIERS.map((tier) => (
-            <NeonCard
-              key={tier.id}
-              className={`sponsor-tier sponsor-${tier.color} relative overflow-hidden`}
-            >
-              <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-neon-cyan/10 blur-2xl" />
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-neon-cyan/25 bg-neon-cyan/5 px-3 py-1 text-xs text-neon-cyan">
-                <Sparkles className="h-3.5 w-3.5" />
-                {tier.type}
-              </div>
-              <h3 className="font-display text-xl font-semibold text-text-primary">
-                {tier.name}
-              </h3>
-              <p className="mt-2 text-sm text-text-muted">{tier.investment}</p>
-
-              <div className="mt-4 rounded-xl border border-current/20 bg-white/[0.04] p-4">
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon-cyan">
-                  Premio adjunto
-                </p>
-                <p className="mt-2 font-display text-2xl font-bold text-text-primary">
-                  {tier.prizeAmount}
-                </p>
-                <p className="mt-1 text-sm text-text-muted">
-                  {tier.prizePlace} · {tier.prizeNote}
-                </p>
-              </div>
-
-              <ul className="mt-4 space-y-2">
-                {tier.benefits.map((benefit) => (
-                  <li key={benefit} className="flex gap-2 text-sm text-text-muted">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neon-blue" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                  `Patrocinio ${tier.name} (${tier.prizePlace} ${tier.prizeAmount}) - IoT ULEAM 2026`,
-                )}&body=${encodeURIComponent(
-                  `Hola, somos una organización interesada en el paquete ${tier.name} (${tier.type}) del I Concurso Nacional IoT ULEAM 2026.\n\nDeseamos adjuntar el premio de ${tier.prizePlace}: ${tier.prizeAmount} por categoría.\n\nNombre de la empresa:\nContacto:\nTeléfono:\nCategoría de interés (opcional):\nMensaje:\n`,
-                )}`}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-neon-cyan/35 px-4 py-2.5 text-sm font-medium text-neon-cyan transition-colors hover:bg-neon-cyan/10"
+          {SPONSOR_TIERS.map((tier) => {
+            const TierIcon = TIER_ICON[tier.id as keyof typeof TIER_ICON] ?? Sparkles;
+            return (
+              <NeonCard
+                key={tier.id}
+                className={`sponsor-tier sponsor-${tier.color} relative overflow-hidden`}
               >
-                <Mail className="h-4 w-4" />
-                Quiero este patrocinio
-              </a>
-            </NeonCard>
-          ))}
+                <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-neon-cyan/10 blur-2xl" />
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-neon-cyan/25 bg-neon-cyan/5 px-3 py-1 text-xs text-neon-cyan">
+                  <TierIcon className="h-3.5 w-3.5" />
+                  {tier.type}
+                </div>
+                <h3 className="font-display text-xl font-semibold text-text-primary">
+                  {tier.name}
+                </h3>
+                <p className="mt-2 text-sm text-text-muted">{tier.investment}</p>
+
+                <div className="mt-4 rounded-xl border border-current/20 bg-white/[0.04] p-4">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-neon-cyan">
+                    Premio adjunto
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-bold text-text-primary">
+                    {tier.prizeAmount}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 text-sm text-text-muted">
+                    <TierIcon className="h-4 w-4 shrink-0" />
+                    {tier.prizePlace} · {tier.prizeNote}
+                  </p>
+                </div>
+
+                <ul className="mt-4 space-y-2">
+                  {tier.benefits.map((benefit) => (
+                    <li key={benefit} className="flex gap-2 text-sm text-text-muted">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-neon-cyan" />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                    `Patrocinio ${tier.name} (${tier.prizePlace} ${tier.prizeAmount}) - IoT ULEAM 2026`,
+                  )}&body=${encodeURIComponent(
+                    `Hola, somos una organización interesada en el paquete ${tier.name} (${tier.type}) del I Concurso Nacional IoT ULEAM 2026.\n\nDeseamos adjuntar el premio de ${tier.prizePlace}: ${tier.prizeAmount} por categoría.\n\nNombre de la empresa:\nContacto:\nTeléfono:\nCategoría de interés (opcional):\nMensaje:\n`,
+                  )}`}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-neon-cyan/35 px-4 py-2.5 text-sm font-medium text-neon-cyan transition-colors hover:bg-neon-cyan/10"
+                >
+                  <Mail className="h-4 w-4" />
+                  Quiero este patrocinio
+                </a>
+              </NeonCard>
+            );
+          })}
         </div>
       </div>
     </section>

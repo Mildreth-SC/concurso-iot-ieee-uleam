@@ -596,6 +596,74 @@ textarea {
   transform: translateY(-4px);
 }
 
+.organizer-marquee-card {
+  width: 260px;
+  flex: 0 0 260px;
+}
+
+.sponsor-marquee-card {
+  width: 300px;
+  flex: 0 0 300px;
+}
+
+.organizer-marquee-section {
+  overflow: hidden;
+}
+
+.organizer-marquee-viewport {
+  width: 100%;
+}
+
+/* =====================================================================
+   HORIZONTAL MARQUEE
+   ===================================================================== */
+.marquee-viewport {
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 5%,
+    #000 95%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  flex-wrap: nowrap;
+  animation: marquee-scroll var(--marquee-duration, 28s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-pause-hover:hover {
+  animation-play-state: paused;
+}
+
+.marquee-content {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  align-items: stretch;
+  gap: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.marquee-item {
+  flex: 0 0 auto;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 /* =====================================================================
    PRIZES
    ===================================================================== */
@@ -623,6 +691,51 @@ textarea {
   border-radius: 9999px;
   border: 1px solid currentColor;
   background: rgba(0, 102, 153, 0.04);
+}
+
+.prize-rank-pill {
+  display: inline-flex;
+  min-width: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid;
+  border-radius: 9999px;
+  font-family: var(--font-orbitron), sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.prize-rank-gold {
+  border-color: rgba(218, 165, 32, 0.5);
+  background: rgba(255, 196, 67, 0.12);
+  color: #B8860B;
+}
+
+.prize-rank-silver {
+  border-color: rgba(0, 102, 153, 0.25);
+  background: rgba(0, 174, 239, 0.08);
+  color: #006699;
+}
+
+.prize-rank-bronze {
+  border-color: rgba(184, 115, 51, 0.45);
+  background: rgba(214, 137, 74, 0.1);
+  color: #B87333;
+}
+
+.prize-item-icon {
+  display: flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(0, 102, 153, 0.18);
+  background: rgba(0, 174, 239, 0.08);
+  color: var(--neon-blue);
 }
 
 /* =====================================================================

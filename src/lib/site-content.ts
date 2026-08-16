@@ -24,35 +24,77 @@ export type SiteContent = {
 
 const CONTENT_ID = "main";
 
+/** Lista oficial de organizadores (orden de visualización). */
+export const CANONICAL_ORGANIZERS: OrganizerItem[] = [
+  {
+    id: "ieee-uleam",
+    name: "Rama Estudiantil IEEE ULEAM",
+    short: "IEEE ULEAM",
+    image: "/logos/ieee-uleam.png",
+  },
+  {
+    id: "wie-uleam",
+    name: "WIE ULEAM",
+    short: "WIE ULEAM",
+    image: "/logos/wie-uleam.png",
+  },
+  {
+    id: "ieee-seccion-ecuador",
+    name: "IEEE Sección Ecuador",
+    short: "IEEE Ecuador",
+    image: "/logos/ieee-seccion-ecuador.png",
+  },
+  {
+    id: "fcvt",
+    name: "Facultad de Ciencias de la Vida y Tecnologías",
+    short: "FCVT ULEAM",
+    image: "/logos/facultad-ciencias-vida-tecnologias.png",
+  },
+  {
+    id: "uleam",
+    name: "Universidad Laica Eloy Alfaro de Manabí",
+    short: "ULEAM",
+    image: "/logos/uleam.png",
+  },
+];
+
+/** Imagen incorrecta subida (logo de asociación agronomía, no de la facultad). */
+const INVALID_ORGANIZER_IMAGES: Partial<Record<string, string[]>> = {
+  fcvt: ["fcvt-1786671055707"],
+};
+
 export const DEFAULT_SITE_CONTENT: SiteContent = {
-  organizers: [
-    {
-      id: "ieee-uleam",
-      name: "Rama Estudiantil IEEE ULEAM",
-      short: "IEEE ULEAM",
-      image: "/logos/ieee-uleam.png",
-    },
-    {
-      id: "wie-uleam",
-      name: "WIE ULEAM",
-      short: "WIE ULEAM",
-      image: "/logos/wie-uleam.png",
-    },
-    {
-      id: "fcvt",
-      name: "Facultad de Ciencias de la Vida y Tecnologías",
-      short: "FCVT",
-      image: "/logos/facultad-ciencias-vida-tecnologias.png",
-    },
-    {
-      id: "uleam",
-      name: "Universidad Laica Eloy Alfaro de Manabí",
-      short: "ULEAM",
-      image: "/logos/uleam.png",
-    },
-  ],
+  organizers: CANONICAL_ORGANIZERS,
   sponsors: [],
 };
+
+function isInvalidOrganizerImage(id: string, image: string) {
+  const patterns = INVALID_ORGANIZER_IMAGES[id];
+  if (!patterns?.length || !image) return false;
+  return patterns.some((pattern) => image.includes(pattern));
+}
+
+/** Combina lo guardado en Supabase con la lista oficial y corrige logos erróneos. */
+export function mergeOrganizers(stored: OrganizerItem[]): OrganizerItem[] {
+  const storedMap = new Map(stored.map((item) => [item.id, item]));
+
+  return CANONICAL_ORGANIZERS.map((canonical) => {
+    const saved = storedMap.get(canonical.id);
+    if (!saved) return { ...canonical };
+
+    let image = saved.image?.trim() || canonical.image;
+    if (isInvalidOrganizerImage(canonical.id, image)) {
+      image = canonical.image;
+    }
+
+    return {
+      id: canonical.id,
+      name: canonical.name,
+      short: canonical.short,
+      image,
+    };
+  });
+}
 
 export function isSupabaseConfigured() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -79,12 +121,12 @@ export async function getSiteContent(): Promise<SiteContent> {
     if (error) throw error;
     if (!data) return DEFAULT_SITE_CONTENT;
 
-    const organizers = (data.organizers as OrganizerItem[] | null) ?? [];
+    const storedOrganizers = (data.organizers as OrganizerItem[] | null) ?? [];
     const sponsors = (data.sponsors as SponsorItem[] | null) ?? [];
 
     return {
-      organizers: organizers.length
-        ? organizers
+      organizers: storedOrganizers.length
+        ? mergeOrganizers(storedOrganizers)
         : DEFAULT_SITE_CONTENT.organizers,
       sponsors,
     };
@@ -98,7 +140,7 @@ export async function saveSiteContent(content: SiteContent) {
   const supabase = getSupabaseAdmin();
   const { error } = await supabase.from("site_content").upsert({
     id: CONTENT_ID,
-    organizers: content.organizers,
+    organizers: mergeOrganizers(content.organizers),
     sponsors: content.sponsors,
     updated_at: new Date().toISOString(),
   });
